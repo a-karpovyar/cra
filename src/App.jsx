@@ -1,46 +1,53 @@
-import React from "react";
+import React from 'react';
 
-class App extends React.Component {
+export default class App extends React.Component {
+    state = {
+        count: 0,
+        isCounting: false,
+    };
 
-  constructor() {
-    super();
+  componentDidMount() {
+    const timeCount = localStorage.getItem('timer');
+    if (timeCount)
+      this.setState({ count: Number(timeCount) });
+  }
 
-    this. state = {
-      count: 0
+    componentDidUpdate() {
+      localStorage.setItem('timer', this.state.count)
     }
 
-    this.handleClick =this.handleClick.bind(this);
-    this.handleClick2 =this.handleClick2.bind(this);
+    componentWillUnmount() {
+    clearInterval(this.counterId);
 
+    }
+
+  handleStart = () => {
+    this.setState({ isCounting: true });
+    this.counterId = setInterval(() => { this.setState({ count: this.state.count + 1 }) }, 1000);
   }
 
-
-  handleClick() {
-   // this.setState((prevState)=>({ count: prevState.count + 1 }),()=> console.log('setstatecompleted'));
-    this.setState((prevState)=>({ count: prevState.count + 1 }));
-   // this.setState((prevState)=>({ count: prevState.count + 1 }));
-    console.log('end of click');
+  handleStop = () => {
+    this.setState({ isCounting: false });
+    clearInterval(this.counterId);
   }
 
-  handleClick2() {
-    // this.setState((prevState)=>({ count: prevState.count + 1 }),()=> console.log('setstatecompleted'));
-     this.setState((prevState)=>({ count: prevState.count - 1 }));
-    // this.setState((prevState)=>({ count: prevState.count + 1 }));
-     console.log('end of click');
-   }
-
-  render() {
-    return (
-      <div className="App">
-        Hello from CRA
-        <button onClick={this.handleClick2}>-</button>
-        <span>{this.state.count}</span>
-        <button onClick={this.handleClick}>+</button>
-
-
-      </div>
-    );
+  handleReset = () => {
+    this.setState({ isCounting: false ,count:0 });
+    clearInterval(this.counterId);
+    
   }
+    render() {
+        return (
+            <div className="App">
+                <h1>React Timer</h1>
+                <h3>{this.state.count}</h3>
+                {!this.state.isCounting ? (
+                    <button onClick={this.handleStart}>Start</button>
+                ) : (
+                    <button onClick={this.handleStop}>Stop</button>
+                )}
+                <button onClick={this.handleReset}>Reset</button>
+            </div>
+        );
+    }
 }
-
-export default App;
